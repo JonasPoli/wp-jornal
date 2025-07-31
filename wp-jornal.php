@@ -267,7 +267,7 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $contra)
     ], [
         esc_html($destaque->post_title),
         get_the_date('d/m/Y', $destaque),
-        wpj_limit_chars($destaque->post_content, 1800),
+        wpj_limit_chars($destaque->post_content, 600),
         esc_url($destaque_img['url']),
         esc_html($destaque_img['caption'])
     ], $capa_tpl);
