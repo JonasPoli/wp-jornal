@@ -295,9 +295,11 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $contra)
         $p = get_post($post_id);
         $img = wpj_post_image($post_id);
 
-        $author = get_the_author_meta('display_name', $p->post_author);
+        $first_name = get_the_author_meta('first_name', $p->post_author);
+        $last_name  = get_the_author_meta('last_name', $p->post_author);
+        $author = trim($first_name . ' ' . $last_name);
         $texto = wpj_clean_text($p->post_content);
-        $texto .= ' <small><strong>Autor:</strong> ' . esc_html($author) . ' </small>';
+        $texto .= ' <div><small><strong>Autor:</strong> ' . esc_html($author) . ' </small></div>';
 
         list($parte1, $resto) = wpj_cut_text($texto, 700);
         $paginas = [];
