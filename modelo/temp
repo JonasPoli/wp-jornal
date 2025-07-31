@@ -1,0 +1,135 @@
+Agora, vamos cria um sistema que carrega um layout de materia para cada post, dependendo do tamanho do texto.
+
+O tamanho do texto a ser usado é o texto depois que foram retiradas as tags do DIVI e acrescentado o nome do autor.
+
+Caso o tamanho do texto seja menor do que 700 caracteres, deve usar o modelo modelo/materia-700.html.
+Neste caso deve dividir o texto em 2 partes, sem cortar as palavras, deixando cada um deles numa das colunas, deste trecho do arquivo de modelo:
+
+    <div class="columns">
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_a__</p>
+        </div>
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_b__</p>
+        </div>
+
+
+    </div>
+
+
+
+
+Caso o tamanho do texto seja maior do que 700 caracteres, e menor do que 1600 caracteres, deve usar o modelo modelo/materia-1600.html.
+Neste caso deve dividir o texto em 3 partes, sem cortar as palavras, deixando cada um deles numa das colunas, deste trecho do arquivo de modelo:
+    <div class="columns">
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_a__</p>
+        </div>
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_b__</p>
+        </div>
+
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_c__</p>
+        </div>
+
+    </div>
+
+
+
+Caso o tamanho do texto seja maior do que 1600 caracteres, e menor do que 2200 caracteres, deve usar o modelo modelo/materia-2200.html.
+Neste caso deve dividir o texto em 4 partes, sem cortar as palavras, deixando cada um deles numa das colunas, deste trecho do arquivo de modelo.
+Sendo que o trecho __post_1_conteudo_700__ deve ser cortado no caracter 700 (sem cortar palavra) e o restante deve ser dividido em 3 partes iguais (sem cortar palavras)
+    <div class="columns">
+        <div>
+            <p>__post_1_conteudo_700__</p>
+        </div>
+        <div>
+            <div class="image-placeholder" style="
+    height: 460px;
+    width: 460px;
+    background-size: cover;
+    background-image: url(__post_1_imagem_url__);
+"></div>
+
+            <div class="legenda">__post_1_imagem_legenda__</div>
+        </div>
+    </div>
+
+    <div class="columns">
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_a__</p>
+        </div>
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_b__</p>
+        </div>
+
+        <div>
+            <p>__post_1_conteudo_paragrafo_c__</p>
+        </div>
+
+
+    </div>
+
+
+Caso o tamanho do texto seja maior do que 2200 caracteres, e menor do que 3150 caracteres, deve usar o modelo modelo/materia-3150.html.
+Neste caso deve dividir o texto em 6 partes, sem cortar as palavras, deixando cada um deles numa das colunas, deste trecho do arquivo de modelo.
+Sendo que o trecho __post_1_conteudo_600__ deve ser cortado no caracter 600 (sem cortar palavra) sepois, a segunda parte deve ter 170 caracteres, sem cortar palavra, em __post_2_conteudo_170__
+Depois, a terceira parte, deve ter 600 caracteres, sem cortar palavra. __post_3_conteudo_600__
+
+O restante deve ser dividido em 3 partes iguais, sem cortar palavras, em __post_4_conteudo_600__, __post_5_conteudo_600__ e __post_6_conteudo_600__
+
+<div class="page" id="materia-3150">
+
+    <h2 class="section-title">__post_1_titulo__</h2>
+    <p class="date">__post_1_data__</p>
+
+    <div class="columns">
+        <div>
+            <p>__post_1_conteudo_600__</p>
+        </div>        <div>
+        <div class="image-placeholder" style="
+    height: 190px;
+    /* width: 460px; */
+    background-size: cover;
+    background-image: url(__post_1_imagem_url__);
+"></div>
+
+        <div class="legenda" style="
+    margin-bottom: 20px;
+">__post_1_imagem_legenda__</div>
+
+        __post_2_conteudo_170__
+    </div>
+        <div>
+            <p>__post_3_conteudo_600__</p>
+        </div>
+
+    </div>
+
+
+
+    <div class="columns">
+
+        <div>
+            <p>__post_4_conteudo_600__</p>
+        </div>
+
+        <div>
+            <p>__post_5_conteudo_600__</p>
+        </div>
+
+        <div>
+            <p>__post_6_conteudo_600__</p>
+        </div>
+
+
+    </div>
+</div>
