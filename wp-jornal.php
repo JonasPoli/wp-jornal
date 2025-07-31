@@ -56,7 +56,7 @@ function wpj_admin_page()
     } elseif ($step === 2) {
         // Passo 2 - Seleciona 4 posts
         $destaque_id = intval($_POST['destaque']);
-        $posts = wpj_recent_posts($destaque_id);
+        $posts = wpj_recent_posts([$destaque_id]);
         echo '<h2>2. Selecione quatro destaques para a página principal</h2>';
         echo '<form method="post">';
         echo '<input type="hidden" name="step" value="3">';
@@ -70,34 +70,59 @@ function wpj_admin_page()
         submit_button('Próximo');
         echo '</form>';
     } elseif ($step === 3) {
-        // Passo 3 - Dados da contracapa
+        // Passo 3 - Seleciona demais matérias
         $destaque_id = intval($_POST['destaque']);
         $posts_ids = array_map('intval', $_POST['posts'] ?? []);
         if (count($posts_ids) !== 4) {
             echo '<div class="notice notice-error"><p>É necessário selecionar exatamente quatro posts.</p></div>';
             echo '<a href="' . esc_url(admin_url('admin.php?page=wp-jornal')) . '" class="button">Voltar</a>';
         } else {
-            $defaults = wpj_contracapa_defaults();
-            echo '<h2>3. Preencha os dados da contracapa</h2>';
+            $exclude = array_merge([$destaque_id], $posts_ids);
+            $posts = wpj_recent_posts($exclude);
+            echo '<h2>3. Selecione outras matérias do jornal</h2>';
             echo '<form method="post">';
             echo '<input type="hidden" name="step" value="4">';
             echo '<input type="hidden" name="destaque" value="' . esc_attr($destaque_id) . '">';
             foreach ($posts_ids as $id) {
                 echo '<input type="hidden" name="posts[]" value="' . esc_attr($id) . '">';
             }
-            foreach ($defaults as $field => $value) {
-                echo '<p><label>' . esc_html(str_replace('_', ' ', $field)) . ': '; 
-                echo '<input type="text" name="contra[' . esc_attr($field) . ']" value="' . esc_attr($value) . '" size="40"></label></p>';
+            foreach ($posts as $p) {
+                $date = get_the_date('d/m/Y', $p);
+                $thumb = get_the_post_thumbnail($p->ID, 'thumbnail');
+                echo '<p><label><input type="checkbox" name="extras[]" value="' . esc_attr($p->ID) . '"> ' . $thumb . ' ' . esc_html($p->post_title) . ' (' . esc_html($date) . ')</label></p>';
             }
-            submit_button('Gerar jornal');
+            submit_button('Próximo');
             echo '</form>';
         }
     } elseif ($step === 4) {
+        // Passo 4 - Dados da contracapa
+        $destaque_id = intval($_POST['destaque']);
+        $posts_ids = array_map('intval', $_POST['posts'] ?? []);
+        $extras_ids = array_map('intval', $_POST['extras'] ?? []);
+        $defaults = wpj_contracapa_defaults();
+        echo '<h2>4. Preencha os dados da contracapa</h2>';
+        echo '<form method="post">';
+        echo '<input type="hidden" name="step" value="5">';
+        echo '<input type="hidden" name="destaque" value="' . esc_attr($destaque_id) . '">';
+        foreach ($posts_ids as $id) {
+            echo '<input type="hidden" name="posts[]" value="' . esc_attr($id) . '">';
+        }
+        foreach ($extras_ids as $id) {
+            echo '<input type="hidden" name="extras[]" value="' . esc_attr($id) . '">';
+        }
+        foreach ($defaults as $field => $value) {
+            echo '<p><label>' . esc_html(str_replace('_', ' ', $field)) . ': ';
+            echo '<input type="text" name="contra[' . esc_attr($field) . ']" value="' . esc_attr($value) . '" size="40"></label></p>';
+        }
+        submit_button('Gerar jornal');
+        echo '</form>';
+    } elseif ($step === 5) {
         // Gera jornal
         $destaque_id = intval($_POST['destaque']);
         $posts_ids = array_map('intval', $_POST['posts'] ?? []);
+        $extras_ids = array_map('intval', $_POST['extras'] ?? []);
         $contra = array_map('sanitize_text_field', $_POST['contra'] ?? []);
-        $url = wpj_generate_jornal($destaque_id, $posts_ids, $contra);
+        $url = wpj_generate_jornal($destaque_id, $posts_ids, $extras_ids, $contra);
         if ($url) {
             echo '<div class="updated notice"><p>Jornal gerado com sucesso! <a href="' . esc_url($url) . '" target="_blank">Abrir jornal</a></p></div>';
         } else {
@@ -113,7 +138,7 @@ function wpj_admin_page()
 /**
  * Busca posts dos últimos 18 meses
  */
-function wpj_recent_posts($exclude = 0)
+function wpj_recent_posts($exclude = [])
 {
     $args = [
         'date_query' => [
@@ -124,7 +149,7 @@ function wpj_recent_posts($exclude = 0)
         'post_type' => 'post',
         'orderby' => 'date',
         'order' => 'DESC',
-        'exclude' => $exclude ? [$exclude] : [],
+        'post__not_in' => (array) $exclude,
     ];
     return get_posts($args);
 }
@@ -246,7 +271,7 @@ function wpj_limit_chars($text, $limit)
 /**
  * Gera HTML do jornal
  */
-function wpj_generate_jornal($destaque_id, $posts_ids, $contra)
+function wpj_generate_jornal($destaque_id, $posts_ids, $extras_ids, $contra)
 {
     $template_dir = WP_JORNAL_DIR . 'modelo/';
     $capa_tpl = file_get_contents($template_dir . 'capa.html');
@@ -263,13 +288,15 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $contra)
         '__destaque_data__',
         '__destaque_chamada__',
         '__destaque_imagem_url__',
-        '__destaque_imagem_legenda__'
+        '__destaque_imagem_legenda__',
+        '__destaque_anchor__'
     ], [
         esc_html($destaque->post_title),
         get_the_date('d/m/Y', $destaque),
         wpj_limit_chars($destaque->post_content, 600),
         esc_url($destaque_img['url']),
-        esc_html($destaque_img['caption'])
+        esc_html($destaque_img['caption']),
+        esc_attr('materia-' . $destaque_id)
     ], $capa_tpl);
 
     // Outros posts na capa
@@ -280,17 +307,19 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $contra)
         $capa = str_replace([
             "__post_{$index}_titulo__",
             "__post_{$index}_data__",
-            "__post_{$index}_chamada__"
+            "__post_{$index}_chamada__",
+            "__post_{$index}_anchor__"
         ], [
             esc_html($p->post_title),
             get_the_date('d/m/Y', $p),
-            wpj_limit_chars($p->post_content, $limits[$i])
+            wpj_limit_chars($p->post_content, $limits[$i]),
+            esc_attr('materia-' . $post_id)
         ], $capa);
     }
 
-    // Matérias (destaque + 4 posts)
+    // Matérias (destaque + demais posts)
     $materias_html = '';
-    $all_posts = array_merge([$destaque_id], $posts_ids);
+    $all_posts = array_merge([$destaque_id], $posts_ids, $extras_ids);
     foreach ($all_posts as $post_id) {
         $p = get_post($post_id);
         $img = wpj_post_image($post_id);
@@ -323,7 +352,8 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $contra)
             '__post_1_conteudo_paragrafo_b__',
             '__post_1_conteudo_paragrafo_c__',
             '__post_1_imagem_url__',
-            '__post_1_imagem_legenda__'
+            '__post_1_imagem_legenda__',
+            '__post_anchor__'
         ], [
             esc_html($p->post_title),
             get_the_date('d/m/Y', $p),
@@ -332,7 +362,8 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $contra)
             $primeira_pagina[1] ?? '',
             $primeira_pagina[2] ?? '',
             esc_url($img['url']),
-            esc_html($img['caption'])
+            esc_html($img['caption']),
+            esc_attr('materia-' . $post_id)
         ], $materia_tpl);
         $materias_html .= $temp;
 
