@@ -172,11 +172,12 @@ function wpj_list_jornais()
 }
 
 /**
- * Remove shortcodes do Divi e tags HTML.
+ * Remove shortcodes do Divi, trechos entre colchetes e tags HTML.
  */
 function wpj_clean_text($text)
 {
     $text = strip_shortcodes($text);
+    $text = preg_replace('/\[[^\]]*\]/', '', $text);
     $text = wp_strip_all_tags($text);
     $text = preg_replace('/\s+/u', ' ', $text);
     return trim($text);
