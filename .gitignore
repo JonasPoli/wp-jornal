@@ -1,0 +1,19 @@
+# Ignora toda a instalação WordPress exceto o plugin
+wordpress/*
+!wordpress/wp-content/
+wordpress/wp-content/*
+!wordpress/wp-content/plugins/
+wordpress/wp-content/plugins/*
+!wordpress/wp-content/plugins/meu-plugin/
+
+# Ignorar arquivos e pastas indesejadas no projeto inteiro
+*.log
+*.tmp
+*.zip
+.DS_Store
+Thumbs.db
+.env
+node_modules/
+vendor/
+.idea/
+.vscode/
