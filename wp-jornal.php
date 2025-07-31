@@ -412,6 +412,42 @@ function wpj_render_materia_html($post_id)
             $parts[2] ?? '',
         ]);
         return str_replace($search, $replace, $template);
+    } elseif ($len <= 60000) {
+        $template = file_get_contents($template_dir . 'materia-6000.html');
+        $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
+        list($p1, $resto) = wpj_cut_text($texto, 600);
+        list($p2, $resto) = wpj_cut_text($resto, 600);
+        list($p3, $resto) = wpj_cut_text($resto, 600);
+        list($p4, $resto) = wpj_cut_text($resto, 600);
+        list($p5, $resto) = wpj_cut_text($resto, 600);
+        list($p6, $resto) = wpj_cut_text($resto, 600);
+        list($p7, $resto) = wpj_cut_text($resto, 600);
+        $parts = wpj_split_equal_parts($resto, 3);
+        $search = array_merge($search, [
+            '__post_1_conteudo_600__',
+            '__post_2_conteudo_600__',
+            '__post_3_conteudo_600__',
+            '__post_4_conteudo_600__',
+            '__post_5_conteudo_600__',
+            '__post_6_conteudo_600__',
+            '__post_7_conteudo_600__',
+            '__post_8_conteudo_600__',
+            '__post_9_conteudo_600__',
+            '__post_10_conteudo_600__',
+        ]);
+        $replace = array_merge($replace, [
+            $p1,
+            $p2,
+            $p3,
+            $p4,
+            $p5,
+            $p6,
+            $p7,
+            $parts[0] ?? '',
+            $parts[1] ?? '',
+            $parts[2] ?? '',
+        ]);
+        return str_replace($search, $replace, $template);
     }
 
     // Fallback para textos muito longos
@@ -504,7 +540,7 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $extras_ids, $contra)
     ], $capa_tpl);
 
     // Outros posts na capa
-    $limits = [300, 200, 200, 200];
+    $limits = [200, 200, 200, 200];
     foreach ($posts_ids as $i => $post_id) {
         $p = get_post($post_id);
         $index = $i + 1;
