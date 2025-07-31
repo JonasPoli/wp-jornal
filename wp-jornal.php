@@ -455,56 +455,102 @@ function wpj_render_materia_html($post_id)
 }
 
 /**
- * Renderiza a matéria utilizando o layout padrão com páginas extras.
- * Mantido como fallback para textos maiores que 6000 caracteres.
+ * Renderiza matérias com mais de 6000 caracteres utilizando o mesmo
+ * layout do modelo materia-6000.html, adicionando páginas extras a
+ * cada 3600 caracteres.
  */
 function wpj_render_large_materia($p, $img, $texto, $base_search, $base_replace)
 {
     $template_dir = WP_JORNAL_DIR . 'modelo/';
-    $materia_tpl = file_get_contents($template_dir . 'materia.html');
-    $materia_full_tpl = file_get_contents($template_dir . 'materia-full.html');
+    $template = file_get_contents($template_dir . 'materia-6000.html');
+    $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
 
-    list($parte1, $resto) = wpj_cut_text($texto, 700);
-    $paginas = [];
-    if (mb_strlen($resto) <= 4900) {
-        $paginas[] = wpj_split_equal_parts($resto, 3);
-    } else {
-        list($primeira, $resto_total) = wpj_cut_text($resto, 4900);
-        $paginas[] = wpj_split_equal_parts($primeira, 3);
-        while ($resto_total !== '') {
-            list($chunk, $resto_total) = wpj_cut_text($resto_total, 6700);
-            $paginas[] = wpj_split_equal_parts($chunk, 3);
-        }
+    // Divide o texto em blocos de 600 caracteres.
+    $chunks = [];
+    $resto = $texto;
+    while ($resto !== '') {
+        list($parte, $resto) = wpj_cut_text($resto, 600);
+        $chunks[] = $parte;
     }
 
-    $primeira_pagina = array_shift($paginas);
+    // Garante que existam pelo menos 10 blocos para preencher o template base.
+    for ($i = count($chunks); $i < 10; $i++) {
+        $chunks[$i] = '';
+    }
+
     $search = array_merge($base_search, [
-        '__post_1_conteudo_700__',
-        '__post_1_conteudo_paragrafo_a__',
-        '__post_1_conteudo_paragrafo_b__',
-        '__post_1_conteudo_paragrafo_c__',
+        '__post_1_conteudo_600__',
+        '__post_2_conteudo_600__',
+        '__post_3_conteudo_600__',
+        '__post_4_conteudo_600__',
+        '__post_5_conteudo_600__',
+        '__post_6_conteudo_600__',
+        '__post_7_conteudo_600__',
+        '__post_8_conteudo_600__',
+        '__post_9_conteudo_600__',
+        '__post_10_conteudo_600__',
     ]);
-    $replace = array_merge($base_replace, [
-        $parte1,
-        $primeira_pagina[0] ?? '',
-        $primeira_pagina[1] ?? '',
-        $primeira_pagina[2] ?? '',
-    ]);
+    $replace = array_merge($base_replace, array_slice($chunks, 0, 10));
 
-    $materia_tpl = str_replace($search, $replace, $materia_tpl);
-    $html = $materia_tpl;
+    $html = str_replace($search, $replace, $template);
 
-    foreach ($paginas as $pagina) {
-        $temp = str_replace([
-            '__post_1_conteudo_paragrafo_a__',
-            '__post_1_conteudo_paragrafo_b__',
-            '__post_1_conteudo_paragrafo_c__'
-        ], [
-            $pagina[0] ?? '',
-            $pagina[1] ?? '',
-            $pagina[2] ?? ''
-        ], $materia_full_tpl);
-        $html .= $temp;
+    // Páginas adicionais: cada uma comporta 6 blocos de 600 caracteres.
+    $chunks = array_slice($chunks, 10);
+    $page_tpl = <<<'HTML'
+<div class="page">
+
+    <div class="columns">
+
+        <div>
+            <p>%s</p>
+        </div>
+
+        <div>
+            <p>%s</p>
+        </div>
+
+        <div>
+            <p>%s</p>
+        </div>
+
+
+    </div>
+
+    <hr style="margin: 1px;margin-top: -15px;">
+    <div class="columns">
+
+        <div>
+            <p>%s</p>
+        </div>
+
+        <div>
+            <p>%s</p>
+        </div>
+
+        <div>
+            <p>%s</p>
+        </div>
+
+
+    </div>
+</div>
+HTML;
+
+    while (!empty($chunks)) {
+        $pagina = array_slice($chunks, 0, 6);
+        $chunks = array_slice($chunks, 6);
+        for ($i = 0; $i < 6; $i++) {
+            $pagina[$i] = $pagina[$i] ?? '';
+        }
+        $html .= sprintf(
+            $page_tpl,
+            $pagina[0],
+            $pagina[1],
+            $pagina[2],
+            $pagina[3],
+            $pagina[4],
+            $pagina[5]
+        );
     }
 
     return $html;
