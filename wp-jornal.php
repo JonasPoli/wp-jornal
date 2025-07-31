@@ -269,14 +269,218 @@ function wpj_limit_chars($text, $limit)
 }
 
 /**
+ * Renderiza o HTML da matéria de acordo com o tamanho do texto.
+ *
+ * Para textos com até 4000 caracteres são utilizados layouts específicos
+ * localizados em /modelo (materia-700, materia-1600, materia-2200,
+ * materia-3150 e materia-4000). Cada layout define como o conteúdo deve ser
+ * fatiado entre as colunas da página. Caso o texto ultrapasse esse limite,
+ * é utilizado o layout padrão com páginas adicionais (materia.html e
+ * materia-full.html).
+ *
+ * @param int $post_id ID do post a ser renderizado.
+ * @return string HTML gerado para a matéria.
+ */
+function wpj_render_materia_html($post_id)
+{
+    $p = get_post($post_id);
+    if (!$p) {
+        return '';
+    }
+
+    $template_dir = WP_JORNAL_DIR . 'modelo/';
+    $img = wpj_post_image($post_id);
+
+    $first_name = get_the_author_meta('first_name', $p->post_author);
+    $last_name  = get_the_author_meta('last_name', $p->post_author);
+    $author = trim($first_name . ' ' . $last_name);
+
+    $texto = wpj_clean_text($p->post_content);
+    $texto .= ' <div><small><strong>Autor:</strong> ' . esc_html($author) . '</small></div>';
+    $len = mb_strlen($texto);
+
+    $search = [
+        '__post_1_titulo__',
+        '__post_1_data__',
+        '__post_1_imagem_url__',
+        '__post_1_imagem_legenda__',
+        '__post_anchor__',
+    ];
+    $replace = [
+        esc_html($p->post_title),
+        get_the_date('d/m/Y', $p),
+        esc_url($img['url']),
+        esc_html($img['caption']),
+        esc_attr('materia-' . $post_id),
+    ];
+
+    // Escolhe layout conforme o tamanho do texto
+    if ($len <= 700) {
+        $template = file_get_contents($template_dir . 'materia-700.html');
+        $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
+        $parts = wpj_split_equal_parts($texto, 2);
+        $search = array_merge($search, [
+            '__post_1_conteudo_paragrafo_a__',
+            '__post_1_conteudo_paragrafo_b__',
+        ]);
+        $replace = array_merge($replace, [
+            $parts[0] ?? '',
+            $parts[1] ?? '',
+        ]);
+        return str_replace($search, $replace, $template);
+    } elseif ($len <= 1600) {
+        $template = file_get_contents($template_dir . 'materia-1600.html');
+        $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
+        $parts = wpj_split_equal_parts($texto, 3);
+        $search = array_merge($search, [
+            '__post_1_conteudo_paragrafo_a__',
+            '__post_1_conteudo_paragrafo_b__',
+            '__post_1_conteudo_paragrafo_c__',
+        ]);
+        $replace = array_merge($replace, [
+            $parts[0] ?? '',
+            $parts[1] ?? '',
+            $parts[2] ?? '',
+        ]);
+        return str_replace($search, $replace, $template);
+    } elseif ($len <= 2200) {
+        $template = file_get_contents($template_dir . 'materia-2200.html');
+        $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
+        list($p700, $resto) = wpj_cut_text($texto, 700);
+        $parts = wpj_split_equal_parts($resto, 3);
+        $search = array_merge($search, [
+            '__post_1_conteudo_700__',
+            '__post_1_conteudo_paragrafo_a__',
+            '__post_1_conteudo_paragrafo_b__',
+            '__post_1_conteudo_paragrafo_c__',
+        ]);
+        $replace = array_merge($replace, [
+            $p700,
+            $parts[0] ?? '',
+            $parts[1] ?? '',
+            $parts[2] ?? '',
+        ]);
+        return str_replace($search, $replace, $template);
+    } elseif ($len <= 3150) {
+        $template = file_get_contents($template_dir . 'materia-3150.html');
+        $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
+        list($p1, $resto) = wpj_cut_text($texto, 600);
+        list($p2, $resto) = wpj_cut_text($resto, 170);
+        list($p3, $resto) = wpj_cut_text($resto, 600);
+        $parts = wpj_split_equal_parts($resto, 3);
+        $search = array_merge($search, [
+            '__post_1_conteudo_600__',
+            '__post_2_conteudo_170__',
+            '__post_3_conteudo_600__',
+            '__post_4_conteudo_600__',
+            '__post_5_conteudo_600__',
+            '__post_6_conteudo_600__',
+        ]);
+        $replace = array_merge($replace, [
+            $p1,
+            $p2,
+            $p3,
+            $parts[0] ?? '',
+            $parts[1] ?? '',
+            $parts[2] ?? '',
+        ]);
+        return str_replace($search, $replace, $template);
+    } elseif ($len <= 4000) {
+        $template = file_get_contents($template_dir . 'materia-4000.html');
+        $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
+        list($p1, $resto) = wpj_cut_text($texto, 600);
+        list($p2, $resto) = wpj_cut_text($resto, 600);
+        list($p3, $resto) = wpj_cut_text($resto, 600);
+        list($p4, $resto) = wpj_cut_text($resto, 600);
+        $parts = wpj_split_equal_parts($resto, 3);
+        $search = array_merge($search, [
+            '__post_1_conteudo_600__',
+            '__post_2_conteudo_600__',
+            '__post_3_conteudo_600__',
+            '__post_4_conteudo_600__',
+            '__post_5_conteudo_600__',
+            '__post_6_conteudo_600__',
+            '__post_7_conteudo_600__',
+        ]);
+        $replace = array_merge($replace, [
+            $p1,
+            $p2,
+            $p3,
+            $p4,
+            $parts[0] ?? '',
+            $parts[1] ?? '',
+            $parts[2] ?? '',
+        ]);
+        return str_replace($search, $replace, $template);
+    }
+
+    // Fallback para textos muito longos
+    return wpj_render_large_materia($p, $img, $texto, $search, $replace);
+}
+
+/**
+ * Renderiza a matéria utilizando o layout padrão com páginas extras.
+ * Mantido como fallback para textos maiores que 4000 caracteres.
+ */
+function wpj_render_large_materia($p, $img, $texto, $base_search, $base_replace)
+{
+    $template_dir = WP_JORNAL_DIR . 'modelo/';
+    $materia_tpl = file_get_contents($template_dir . 'materia.html');
+    $materia_full_tpl = file_get_contents($template_dir . 'materia-full.html');
+
+    list($parte1, $resto) = wpj_cut_text($texto, 700);
+    $paginas = [];
+    if (mb_strlen($resto) <= 4900) {
+        $paginas[] = wpj_split_equal_parts($resto, 3);
+    } else {
+        list($primeira, $resto_total) = wpj_cut_text($resto, 4900);
+        $paginas[] = wpj_split_equal_parts($primeira, 3);
+        while ($resto_total !== '') {
+            list($chunk, $resto_total) = wpj_cut_text($resto_total, 6700);
+            $paginas[] = wpj_split_equal_parts($chunk, 3);
+        }
+    }
+
+    $primeira_pagina = array_shift($paginas);
+    $search = array_merge($base_search, [
+        '__post_1_conteudo_700__',
+        '__post_1_conteudo_paragrafo_a__',
+        '__post_1_conteudo_paragrafo_b__',
+        '__post_1_conteudo_paragrafo_c__',
+    ]);
+    $replace = array_merge($base_replace, [
+        $parte1,
+        $primeira_pagina[0] ?? '',
+        $primeira_pagina[1] ?? '',
+        $primeira_pagina[2] ?? '',
+    ]);
+
+    $materia_tpl = str_replace($search, $replace, $materia_tpl);
+    $html = $materia_tpl;
+
+    foreach ($paginas as $pagina) {
+        $temp = str_replace([
+            '__post_1_conteudo_paragrafo_a__',
+            '__post_1_conteudo_paragrafo_b__',
+            '__post_1_conteudo_paragrafo_c__'
+        ], [
+            $pagina[0] ?? '',
+            $pagina[1] ?? '',
+            $pagina[2] ?? ''
+        ], $materia_full_tpl);
+        $html .= $temp;
+    }
+
+    return $html;
+}
+
+/**
  * Gera HTML do jornal
  */
 function wpj_generate_jornal($destaque_id, $posts_ids, $extras_ids, $contra)
 {
     $template_dir = WP_JORNAL_DIR . 'modelo/';
     $capa_tpl = file_get_contents($template_dir . 'capa.html');
-    $materia_tpl = file_get_contents($template_dir . 'materia.html');
-    $materia_full_tpl = file_get_contents($template_dir . 'materia-full.html');
     $contracapa_tpl = file_get_contents($template_dir . 'contracapa.html');
     $html_tpl = file_get_contents($template_dir . 'html-completo.html');
 
@@ -321,64 +525,7 @@ function wpj_generate_jornal($destaque_id, $posts_ids, $extras_ids, $contra)
     $materias_html = '';
     $all_posts = array_merge([$destaque_id], $posts_ids, $extras_ids);
     foreach ($all_posts as $post_id) {
-        $p = get_post($post_id);
-        $img = wpj_post_image($post_id);
-
-        $first_name = get_the_author_meta('first_name', $p->post_author);
-        $last_name  = get_the_author_meta('last_name', $p->post_author);
-        $author = trim($first_name . ' ' . $last_name);
-        $texto = wpj_clean_text($p->post_content);
-        $texto .= ' <div><small><strong>Autor:</strong> ' . esc_html($author) . ' </small></div>';
-
-        list($parte1, $resto) = wpj_cut_text($texto, 700);
-        $paginas = [];
-        if (mb_strlen($resto) <= 4900) {
-            $paginas[] = wpj_split_equal_parts($resto, 3);
-        } else {
-            list($primeira, $resto_total) = wpj_cut_text($resto, 4900);
-            $paginas[] = wpj_split_equal_parts($primeira, 3);
-            while ($resto_total !== '') {
-                list($chunk, $resto_total) = wpj_cut_text($resto_total, 6700);
-                $paginas[] = wpj_split_equal_parts($chunk, 3);
-            }
-        }
-
-        $primeira_pagina = array_shift($paginas);
-        $temp = str_replace([
-            '__post_1_titulo__',
-            '__post_1_data__',
-            '__post_1_conteudo_700__',
-            '__post_1_conteudo_paragrafo_a__',
-            '__post_1_conteudo_paragrafo_b__',
-            '__post_1_conteudo_paragrafo_c__',
-            '__post_1_imagem_url__',
-            '__post_1_imagem_legenda__',
-            '__post_anchor__'
-        ], [
-            esc_html($p->post_title),
-            get_the_date('d/m/Y', $p),
-            $parte1,
-            $primeira_pagina[0] ?? '',
-            $primeira_pagina[1] ?? '',
-            $primeira_pagina[2] ?? '',
-            esc_url($img['url']),
-            esc_html($img['caption']),
-            esc_attr('materia-' . $post_id)
-        ], $materia_tpl);
-        $materias_html .= $temp;
-
-        foreach ($paginas as $pagina) {
-            $temp_full = str_replace([
-                '__post_1_conteudo_paragrafo_a__',
-                '__post_1_conteudo_paragrafo_b__',
-                '__post_1_conteudo_paragrafo_c__'
-            ], [
-                $pagina[0] ?? '',
-                $pagina[1] ?? '',
-                $pagina[2] ?? ''
-            ], $materia_full_tpl);
-            $materias_html .= $temp_full;
-        }
+        $materias_html .= wpj_render_materia_html($post_id);
     }
 
     // Contracapa
