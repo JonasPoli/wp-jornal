@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP Jornal
- * Description: Gera um jornal em HTML a partir das notícias dos últimos 6 meses.
+ * Description: Gera um jornal em HTML a partir das notícias dos últimos 18 meses.
  * Version: 1.0.0
  * Author: Seu Nome
  */
@@ -111,13 +111,13 @@ function wpj_admin_page()
 }
 
 /**
- * Busca posts dos últimos 6 meses
+ * Busca posts dos últimos 18 meses
  */
 function wpj_recent_posts($exclude = 0)
 {
     $args = [
         'date_query' => [
-            'after' => date('Y-m-d', strtotime('-6 months')),
+            'after' => date('Y-m-d', strtotime('-18 months')),
         ],
         'posts_per_page' => -1,
         'post_status' => 'publish',
