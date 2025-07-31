@@ -1,9 +1,0 @@
-{
-
-  "core": "some/repo#trunk",
-  "plugins": ["some/repo#main"],
-
-  "config": {
-    "WP_DEBUG": true
-  }
-}

@@ -1,25 +1,20 @@
-# Ignora toda a instalação WordPress exceto o plugin
-wordpress/*
-!wordpress/wp-content/
-wordpress/wp-content/*
-!wordpress/wp-content/plugins/
-wordpress/wp-content/plugins/*
-!wordpress/wp-content/plugins/meu-plugin/
-
-# Ignorar arquivos e pastas indesejadas no projeto inteiro
-*.log
-*.tmp
-*.zip
+# Arquivos do sistema
 .DS_Store
 Thumbs.db
-.env
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Logs e backups
+*.log
+*.zip
+*.bak
+
+# Node/Composer (se você usar depois)
 node_modules/
 vendor/
-.idea/
-.vscode/
-# MAS permite tudo dentro de wordpress/wp-content/plugins/meu-plugin/modelo/
-!wordpress/wp-content/plugins/meu-plugin/modelo/
-!wordpress/wp-content/plugins/meu-plugin/modelo/**
 
-# Permite o arquivo principal do plugin
-!wordpress/wp-content/plugins/meu-plugin/meu-plugin.php
+# wp-env
+wp-env/
+wordpress/
