@@ -412,7 +412,7 @@ function wpj_render_materia_html($post_id)
             $parts[2] ?? '',
         ]);
         return str_replace($search, $replace, $template);
-    } elseif ($len <= 60000) {
+    } elseif ($len <= 6000) {
         $template = file_get_contents($template_dir . 'materia-6000.html');
         $template = preg_replace('/<div class="page"[^>]*>/', '<div class="page" id="__post_anchor__">', $template, 1);
         list($p1, $resto) = wpj_cut_text($texto, 600);
@@ -456,7 +456,7 @@ function wpj_render_materia_html($post_id)
 
 /**
  * Renderiza a matéria utilizando o layout padrão com páginas extras.
- * Mantido como fallback para textos maiores que 4000 caracteres.
+ * Mantido como fallback para textos maiores que 6000 caracteres.
  */
 function wpj_render_large_materia($p, $img, $texto, $base_search, $base_replace)
 {
