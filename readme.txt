@@ -1,10 +1,10 @@
 === WP Jornal ===
 Contributors: seu-usuario
-Tags: admin, mensagem
+Tags: jornal, gerador, noticias
 Requires at least: 6.0
 Tested up to: 6.8
-Stable tag: 0.1
+Stable tag: 1.0.0
 License: GPLv2 or later
 
 == Description ==
-Exibe uma mensagem de sucesso no painel administrativo ao ativar o plugin.
+Plugin para gerar um jornal em HTML a partir das notícias publicadas nos últimos 60 dias.
