@@ -48,7 +48,8 @@ function wpj_admin_page()
         echo '<input type="hidden" name="step" value="2">';
         foreach ($posts as $p) {
             $date = get_the_date('d/m/Y', $p);
-            echo '<p><label><input type="radio" name="destaque" value="' . esc_attr($p->ID) . '" required> ' . esc_html($p->post_title) . ' (' . esc_html($date) . ')</label></p>';
+            $thumb = get_the_post_thumbnail($p->ID, 'thumbnail');
+            echo '<p><label><input type="radio" name="destaque" value="' . esc_attr($p->ID) . '" required> ' . $thumb . ' ' . esc_html($p->post_title) . ' (' . esc_html($date) . ')</label></p>';
         }
         submit_button('Próximo');
         echo '</form>';
@@ -62,7 +63,8 @@ function wpj_admin_page()
         echo '<input type="hidden" name="destaque" value="' . esc_attr($destaque_id) . '">';
         foreach ($posts as $p) {
             $date = get_the_date('d/m/Y', $p);
-            echo '<p><label><input type="checkbox" name="posts[]" value="' . esc_attr($p->ID) . '"> ' . esc_html($p->post_title) . ' (' . esc_html($date) . ')</label></p>';
+            $thumb = get_the_post_thumbnail($p->ID, 'thumbnail');
+            echo '<p><label><input type="checkbox" name="posts[]" value="' . esc_attr($p->ID) . '"> ' . $thumb . ' ' . esc_html($p->post_title) . ' (' . esc_html($date) . ')</label></p>';
         }
         echo '<p>Escolha exatamente 4 posts.</p>';
         submit_button('Próximo');
