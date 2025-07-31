@@ -7,4 +7,4 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 
 == Description ==
-Plugin para gerar um jornal em HTML a partir das notícias publicadas nos últimos 60 dias.
+Plugin para gerar um jornal em HTML a partir das notícias publicadas nos últimos 6 meses.
