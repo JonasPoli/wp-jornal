@@ -1,0 +1,58 @@
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs e editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos temporários
+*.log
+*.tmp
+*.swp
+
+# Node / Composer
+node_modules/
+vendor/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Backups e arquivos ZIP
+*.bak
+*.zip
+*.rar
+*.tar.gz
+
+# Testes
+phpunit.xml
+phpunit.result.cache
+
+# Outros
+.env
+.env.local
+.env.*
+
+# Ambiente local
+wp-env/
+wp-content/
+wordpress/
+mysql-data/
+node_modules/
+
+# Arquivos temporários
+*.log
+*.zip
+.env
+.DS_Store
+.idea/
+.vscode/
+
+# MAS permite tudo dentro de wordpress/wp-content/plugins/meu-plugin/modelo/
+!wordpress/wp-content/plugins/meu-plugin/modelo/
+!wordpress/wp-content/plugins/meu-plugin/modelo/**
+
+# Permite o arquivo principal do plugin
+!wordpress/wp-content/plugins/meu-plugin/meu-plugin.php

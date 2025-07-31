@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Jornal O Mensageiro - __data__</title>
+    <style>
+        body { font-family: Georgia, serif; margin: 0; padding: 0; background: #f2f2f2; }
+        .page {
+            background: white;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            page-break-after: always;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .main-title {
+            font-size: 72px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .section-title.small { font-size: 20px; }
+        .date { font-weight: bold; font-size: 14px; margin-bottom: 10px; }
+        .columns {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .columns.with-image .image-placeholder {
+            background: #ccc;
+            width: 100%;
+            height: 250px;
+        }
+        .columns .text, .columns > div {
+            flex: 1;
+        }
+        .columns.three > div {
+            width: 33%;
+        }
+        .image-placeholder {
+            background: #ccc;
+            min-height: 180px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #444;
+        }
+        .with-background {
+            background: #eee;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .small-title {
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .centered-bold {
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            margin: 20px 0;
+        }
+        .caption {
+            font-size: 12px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .footer {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 40px;
+            border-top: 1px solid #999;
+            padding-top: 10px;
+            color: #555;
+        }
+        .legenda  {
+            text-align: center;
+            font-size: 75%;
+        }
+    </style>
+
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                margin: 0 !important;
+            }
+
+            .page {
+                page-break-after: always;
+                page-break-inside: avoid;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0cm;
+                box-shadow: none !important;
+            }
+
+            .footer {
+                position: relative;
+                bottom: 0;
+            }
+
+            a {
+                color: black;
+                text-decoration: none;
+            }
+        }
+
+
+        @page {
+            /*margin: 2cm;*/
+
+            @top-right {
+                content: "O MENSAGEIRO ";
+                font-size: 14px;
+                font-family: Georgia, serif;
+                text-transform: uppercase;
+                font-weight: bold;
+                border-bottom: 1px solid black;
+            }
+
+
+            @top-left {
+                content: "__data__";
+                text-transform: uppercase;
+                font-weight: bold;
+                font-size: 14px;
+                font-family: Georgia, serif;
+                border-bottom: 1px solid black;
+            }
+            @top-center {
+                content: "Página " counter(page);
+                font-size: 11px;
+                font-style: italic;
+                border-bottom: 1px solid black;
+            }
+
+            @bottom-center {
+                content: "Informativo da USE Araraquara - O MENSAGEIRO - Edição Mensal - Distribuição gratuita - Edição digital";
+                font-size: 11px;
+                font-style: italic;
+                border-top: 1px solid black;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+
+__body__
+
+
+
+</body>
+</html>

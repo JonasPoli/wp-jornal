@@ -17,3 +17,9 @@ node_modules/
 vendor/
 .idea/
 .vscode/
+# MAS permite tudo dentro de wordpress/wp-content/plugins/meu-plugin/modelo/
+!wordpress/wp-content/plugins/meu-plugin/modelo/
+!wordpress/wp-content/plugins/meu-plugin/modelo/**
+
+# Permite o arquivo principal do plugin
+!wordpress/wp-content/plugins/meu-plugin/meu-plugin.php

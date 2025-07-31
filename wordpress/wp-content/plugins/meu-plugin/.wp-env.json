@@ -1,0 +1,7 @@
+{
+  "plugins": [ "." ],
+  "core": null,
+  "config": {
+    "WP_DEBUG": true
+  }
+}
